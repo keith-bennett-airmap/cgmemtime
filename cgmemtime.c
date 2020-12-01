@@ -183,8 +183,9 @@ static int cat(const char *file, char *out, size_t len)
 
 static int verify_max_zero(const Options *opts)
 {
-  char file[512] = {0};
-  snprintf(file, 512, "%s/memory.max_usage_in_bytes", opts->sub_group);
+  char file[sizeof(opts->sub_group)+128] = {0};
+  snprintf(file, sizeof(file)-1,
+      "%s/memory.max_usage_in_bytes", opts->sub_group);
   char out[32] = {0};
   int ret = cat(file, out, 32);
   if (ret)
@@ -253,8 +254,8 @@ static int force_empty(const Options *opts)
 {
   if (!opts->force_empty)
     return 0;
-  char file[256] = {0};
-  snprintf(file, 256, "%s/memory.force_empty", opts->sub_group);
+  char file[sizeof(opts->sub_group)+128] = {0};
+  snprintf(file, sizeof(file), "%s/memory.force_empty", opts->sub_group);
   int ret = echo("0", file);
   if (ret)
     return -1;
@@ -290,8 +291,8 @@ static int run_child(const Options *opts)
 
 static int store_cg_rss_highwater(const Options *opts, Output *output)
 {
-  char file[512] = {0};
-  snprintf(file, 512, "%s/memory.max_usage_in_bytes", opts->sub_group);
+  char file[sizeof(opts->sub_group)+128] = {0};
+  snprintf(file, sizeof(file), "%s/memory.max_usage_in_bytes", opts->sub_group);
   char out[32] = {0};
   int ret = cat(file, out, 32);
   if (ret)
@@ -309,8 +310,8 @@ static int store_cg_rss_highwater(const Options *opts, Output *output)
 
 static int add_pid_to_cg(const Options *opts, pid_t pid)
 {
-  char file[512] = {0};
-  snprintf(file, 512, "%s/tasks", opts->sub_group);
+  char file[sizeof(opts->sub_group)+128] = {0};
+  snprintf(file, sizeof(file), "%s/tasks", opts->sub_group);
   char pid_str[32] = {0};
   snprintf(pid_str, 32, "%zd", (ssize_t)pid);
   int ret = echo(pid_str, file);
@@ -444,8 +445,8 @@ static void print(const Options *opts, const Output *output)
 static int verify_tasks_empty(const Options *opts)
 {
   char out[1024] = {0};
-  char file[512] = {0};
-  snprintf(file, 512, "%s/tasks", opts->sub_group);
+  char file[sizeof(opts->sub_group)+128] = {0};
+  snprintf(file, sizeof(file), "%s/tasks", opts->sub_group);
   int ret = cat(file, out, 1024);
   if (ret)
     return -1;
